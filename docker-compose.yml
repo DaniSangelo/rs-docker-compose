@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  database:
+    image: postgres:16-alpine
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: my-ecommerce
+      POSTGRES_USER: api_commerce
+      POSTGRES_PASSWORD: sup3rs3c&t
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  app:
+    image: meu-app-nestjs
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nest_app
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+      - "9229:9229"
+    depends_on:
+      - database
+    networks:
+      - app_network
+
+
+volumes:
+  db_data:
+
+networks:
+  app_network:
+    driver: bridge
